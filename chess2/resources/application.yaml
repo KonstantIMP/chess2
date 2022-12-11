@@ -1,0 +1,10 @@
+oven_cell_color: "#ffffff"
+non_oven_cell_color: "#000000"
+min_figure_size: 64
+hover_color: "#b5b5b5"
+pressed_color: "#dbd7d2"
+danger_color: "#e3256b"
+danger_hover_color: "#f081aa"
+current_color: "#a8ffab"
+step_color: "#f8f32b"
+step_hover_color: "#ceff1d"

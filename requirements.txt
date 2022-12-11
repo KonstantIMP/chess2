@@ -1,0 +1,6 @@
+pyqt6
+pyqt-tools
+pyyaml
+sqlalchemy
+sqlalchemy.orm
+
