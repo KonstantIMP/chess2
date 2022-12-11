@@ -34,10 +34,10 @@
 
 5. Участники
 
-- Константин Михедов (БИБ224) @KonstantIMP
-- Владимир Чудновский (БИБ224) @chudnoffsky
-- Александр Желтов (БИБ224) @Sashagran
-- Хетаг Албегов (БИБ224) @khetagalb
-- Аляс Андарбуа (БИБ224) @AliasAndarbua
+- Константин Михедов (БИБ224) [[@](https://github.com/)KonstantIMP](https://github.com/KonstantIMP)
+- Владимир Чудновский (БИБ224) [[@](https://github.com/)chudnoffsky](https://github.com/chudnoffsky)
+- Александр Желтов (БИБ224) [[@](https://github.com/)Sashagran](https://github.com/Sashagran)
+- Хетаг Албегов (БИБ224) [[@](https://github.com/)khetagalb](https://github.com/khetagalb)
+- Аляс Андарбуа (БИБ224) [[@](https://github.com/)AliasAndarbua](https://github.com/AliasAndarbua)
 
 ![logo](https://github.com/KonstantIMP/chess2/blob/main/.github/logo.jpg?raw=true)
