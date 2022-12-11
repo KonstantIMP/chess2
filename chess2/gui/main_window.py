@@ -225,6 +225,7 @@ class ChessMainWindow(QMainWindow):
             try:
                 self.helper.load_game(text, self.engine)
                 self.board.update_field()
+                self.__clear_history_panel()
 
                 for step in self.engine.history:
                     self.__on_step_done(step)

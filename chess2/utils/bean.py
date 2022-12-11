@@ -12,8 +12,6 @@ import sqlalchemy
 import typing as tp
 import yaml
 
-import asyncio
-
 class BeanManager:
     """
     Loads config file, inits mappers and base game engine
