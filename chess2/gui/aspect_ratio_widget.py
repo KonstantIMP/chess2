@@ -1,5 +1,6 @@
 """
-Widget which makes aspect ratio for child constant
+Виджет, которые поддерживает постоянное соотношение
+сторон у дочернего элемента
 """
 from PyQt6.QtWidgets import QWidget, QBoxLayout, QSpacerItem
 from PyQt6.QtGui import QResizeEvent
@@ -7,7 +8,8 @@ from PyQt6.QtGui import QResizeEvent
 
 class AspectRatioWidget(QWidget):
     """
-    Widget which makes aspect ratio for child constant
+    Поддерживает постоянное соотношение сторон у
+    элемента child (width/height = const)
     """
     def __init__(self, child: QWidget, width: float = 1.0, height: float = 1.0):
         super(AspectRatioWidget, self).__init__()

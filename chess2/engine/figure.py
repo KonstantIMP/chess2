@@ -1,5 +1,5 @@
 """
-Base figure's description
+Описание фигуры
 """
 from dataclasses import dataclass
 
@@ -10,7 +10,7 @@ from chess2.engine.position import Position
 
 @dataclass()
 class Figure:
-    """Base figure's description"""
+    """Каждая фигура состоит из типа и цвета"""
     type: FigureType
     color: FigureColor
 #    position: Position

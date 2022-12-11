@@ -1,5 +1,5 @@
 """
-Bean management
+Менеджер элементов (бинов)
 """
 from chess2.gui.mapper import GuiMapper
 from chess2.engine.mapper import FiguresMapper
@@ -14,7 +14,8 @@ import yaml
 
 class BeanManager:
     """
-    Loads config file, inits mappers and base game engine
+    Загружает конфигурационный файл, подключается к БД и
+    инициализирует мапперы
     """
     def __init__(self):
         self.config = self.__load_config()
@@ -23,7 +24,6 @@ class BeanManager:
         self.gui_mapper = GuiMapper()
 
         self.engine = ChessGame(self.figures_mapper)
-        #self.engine.create_new_game()
 
         self.sql_engine = sqlalchemy.create_engine('sqlite:///games.db', echo=True)
         with self.sql_engine.begin() as connection:
@@ -37,13 +37,13 @@ class BeanManager:
 
     def __load_config(self) -> tp.Dict:
         """
-        Reads and parses application.yaml
-        base is used from resources and additional from
-        the start directory if exist
+        Читает и парсит application.yaml из подпакета
+        с ресурсами и переписывает некоторые параметры из локального
+        конфига, если он существует
         """
         base_config, custom_config = dict(), dict()
 
-        with open(resource_filename('chess_2_0.resources', 'application.yaml')) as stream:
+        with open(resource_filename('chess2.resources', 'application.yaml')) as stream:
             base_config = yaml.safe_load(stream)
 
         if Path('application.yaml').exists():

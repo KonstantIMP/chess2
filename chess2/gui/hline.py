@@ -1,12 +1,12 @@
 """
-Widget for horizontal line display
+Горизонтальная линия(отделитель)
 """
 from PyQt6.QtWidgets import QFrame
 
 
 class HLine(QFrame):
     """
-    Just a horizontal black line
+    Черная горизонтальная полоса
     """
     def __init__(self):
         super(HLine, self).__init__()

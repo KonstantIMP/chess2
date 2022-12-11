@@ -1,5 +1,5 @@
 """
-Saved steps representation
+Описание одного хода в БД
 """
 from sqlalchemy import String, Integer, Column, ForeignKey
 from sqlalchemy.orm import relationship

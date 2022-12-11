@@ -1,5 +1,5 @@
 """
-Table with saved games data
+Описание Игры для хранения в бд
 """
 from sqlalchemy import Column, Integer, String
 from chess2.model.base import Base

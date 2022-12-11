@@ -1,5 +1,5 @@
 """
-The game's implementation
+Основная логика игры
 """
 from chess2.engine.figure_color import FigureColor
 from chess2.engine.figure_type import FigureType
@@ -17,13 +17,13 @@ import typing as tp
 
 class ChessGame:
     """
-    The game's implementation
+    Логика игры
 
-    Attributes:
+    Атрибуты:
     ----------
-        field: The game's field and figures on it
-        mapper: mapper for figures converting 
-        current_color: color of figure's which is available for step
+        field: 8 на 8 поле с фигурами
+        mapper: конвертер для фигур и их расположений 
+        current_color: цвет игрока, чей ход сейчас
     """
     def __init__(self, mapper: FiguresMapper = FiguresMapper()):
         self.field = self.__generate_empty_field()
@@ -35,10 +35,10 @@ class ChessGame:
 
     def create_new_game(self) -> None:
         """
-        Creates new field with setted figures (in correct order)
-        and sets it as a current game's field
+        Создает новое поле и заполняет его начальными значениями
         """
         self.field = self.__generate_empty_field()
+        self.current_color = FigureColor.WHITE
 
         for i in range(8):
             self.field[1][i] = Figure(FigureType.PAWN, FigureColor.BLACK)
@@ -59,11 +59,8 @@ class ChessGame:
 
     def dump_field_to_string(self) -> str:
         """
-        Creates unicode representation of current field
-
-        Returns:
-        --------
-            string with the field in unicode chars 
+        Переводит поле в строку из unicode символов
+        (для тестов и отображения через консоль)
         """
         def line_mapper(line: tp.List[Figure]) -> str:
             return ' '.join(
@@ -83,8 +80,8 @@ class ChessGame:
 
     def get_figure(self, position: tp.Union[Position, tp.Tuple[int, int], str]) -> tp.Optional[Figure]:
         """
-        Takes figure's coordinates (like indexes or 'LetterDigit' coordinates)
-        and returns it (or None if not exsist)
+        Возвращает фигуру, расположенную на указанной позиции
+        Если на позиции нет фигуры, возвращает None
         """
         if not isinstance(position, Position):
             return self.get_figure(self.mapper.map_to_position(position))
@@ -97,7 +94,8 @@ class ChessGame:
 
     def get_available_steps(self, position: tp.Union[Position, tp.Tuple[int, int], str]) -> tp.List[Position]:
         """
-        Returns available steps for the figure at 'position'
+        Возвращает возможные позиции, куда может совершить ход
+        фигура, по заданным координатам
         """
         if not isinstance(position, Position): position = self.mapper.map_to_position(position)
 
@@ -130,7 +128,8 @@ class ChessGame:
 
     def make_step(self, a: Position, b: Position) -> tp.Optional[Step]:
         """
-        Moves figure from one point to another if its possible
+        Выполняет ход фигуры из a в b
+        Если ход невозможен, возвращает None
         """
         if self.get_figure(a).color != self.current_color:
             return None
@@ -160,8 +159,8 @@ class ChessGame:
 
     def __get_available_line_steps(self, position: Position) -> tp.List[tp.List[Position]]:
         """
-        Returns available steps in horizontal-letf/-right and
-        vertical-up/-down directions
+        Возвращает все свободные клетки по горизонтали и вертикали
+        от заданной позиции
         """
         lines = []
 
@@ -184,7 +183,7 @@ class ChessGame:
     
     def __get_available_diagonal_steps(self, position: Position) -> tp.List[tp.List[Position]]:
         """
-        Returns available steps in diagonal directions
+        Возвращает все свободные клетки по диагоналям от заданной позиции
         """
         diagonals = []
 
@@ -208,7 +207,7 @@ class ChessGame:
 
     def __get_available_knight_steps(self, position: Position) -> tp.List[Position]:
         """
-        Get available steps for knight figure
+        GДоступные перемещения для коня
         """
         res = []
 
@@ -221,7 +220,7 @@ class ChessGame:
 
     def __get_available_pawn_steps(self, position: Position) -> tp.List[Position]:
         """
-        Get available steps for pawn figure
+        Доступные перемещения для пешки
         """
         direction_mul = 1 if self.get_figure(position).color == FigureColor.BLACK else -1
 
@@ -230,6 +229,7 @@ class ChessGame:
             if (direction_mul == 1 and position.y == 1) or (direction_mul == -1 and position.y == 6):
                 if self.get_figure(Position(position.x, position.y + direction_mul)) is None:
                     res.append(Position(position.x, position.y + 2 * direction_mul))
+                    if self.get_figure(res[-1]) is not None: res = res[:len(res) - 1]
         else: res = []
 
         temp = [
@@ -246,12 +246,13 @@ class ChessGame:
 
     def get_figures(self, filter_color: tp.Optional[FigureColor] = None) -> tp.List[tp.Tuple[Figure, Position]]:
         """
-        Returns figures and it's positions 
+        Возвращает список всех фигур и их расположений на доске
 
-        Parameters:
+        Параметры:
         ----------
         filter_color: tp.Optional[FigureColor], optional
-            Filters the output by color 
+            Фильтрует фигуры по цвету (можно получить только
+            фигуры определенного цвета) 
         """
         res = []
 
@@ -274,17 +275,14 @@ class ChessGame:
 
     def __swap_current_color(self) -> None:
         """
-        Changes current color (next player)
+        Переход к ходу следующего игрока
         """
         self.current_color = FigureColor.BLACK if self.current_color == FigureColor.WHITE else FigureColor.WHITE
 
 
     def __generate_empty_field(self) -> tp.List[tp.List[tp.Optional[Figure]]]:
         """
-        Creates an empty chess field (no any figures)
-
-        Returns:
-            Array of chess field's rows
+        Создает полностью пустое поле, заполненное None
         """
         return [[None for _ in range(8)] for __ in range(8)]
 

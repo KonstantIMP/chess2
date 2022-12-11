@@ -1,5 +1,5 @@
 """
-Mapping from Figure class to displayable values
+Транслирует оюъект Figure в изображение или в путь до картинки
 """
 from chess2.engine.figure import Figure
 from chess2.engine.position import Position
@@ -11,37 +11,32 @@ import typing as tp
 
 class FiguresMapper:
     """
-    Class for mapping Figure class to displayable value
-    and Positions converting
-
-    Attributes:
-    ----------
-        image_mapping - links to the images for figures display
+    переводит обхект Figure в отображаемый формат
     """
     def __init__(self):
-        self.image_mapping = dict()
+        pass
 
 
     def map_figure_to_unicode(self, figure: Figure) -> str:
         """
-        Maps figure to unicode character for display
+        Переводит фигуру в символ юникода
         """
         return figure.type.value[figure.color.value]
 
 
     def map_figure_to_svg(self, figure: Figure) -> str:
         """
-        Returns path to the svg with the figure's image
+        Возвращает путь до картинки с изображением фигуры
         """
         return resource_filename(
-            'chess_2_0.resources',
+            'chess2.resources',
             ('b' if figure.color == FigureColor.BLACK else 'w') + '_' + str(figure.type).lower().split('.')[-1] + '.svg'
         )
 
 
     def map_to_position(self, position: tp.Union[tp.Tuple[int, int], str]) -> Position:
         """
-        Converts figure's coordinates to Position struct
+        Переводит любой формат координат в Position
         """
         if isinstance(position, str):
             coordinates = (ord(position.lower()[0]) - ord('a'), ord('8') - ord(position[1]))
@@ -53,7 +48,7 @@ class FiguresMapper:
 
     def map_position(self, position: Position) -> str:
         """
-        Converts Position to human readable format
+        Переводит Position в шахматный формат (буквацифра)
         """
         return f'{chr(ord("A") + position.x)}{8 - position.y}'
 

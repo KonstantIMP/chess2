@@ -1,5 +1,5 @@
 """
-Description of step
+Описание одного игрового шага
 """
 from chess2.engine.position import Position
 from dataclasses import dataclass
@@ -11,7 +11,8 @@ import typing as tp
 @dataclass
 class Step:
     """
-    describes figure's move from point a to point b
+    Описывает перемещение фигуры из точки a в точку b и события,
+    которые это перемещение спровоцировало
     """
     a: Position
     b: Position

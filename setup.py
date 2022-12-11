@@ -1,5 +1,5 @@
 """
-  Setup file for the Chess 2.0 project
+Chess 2.0 - описание пакета и проекта в целом
 """
 from setuptools import find_packages, setup
 from pathlib import Path
@@ -8,13 +8,13 @@ import typing as tp
 
 def read_requirements(path: str) -> tp.List[str]:
     """
-    Reads file from 'path' in requirements.txt format
-    and creates list of dependencies from it
+    Читает requirments.txt и генерирует из него
+    список необходимых зависимостей
 
-    Parameters
-    ----------
+    Параметры
+    ---------
     path : str, required
-        Path to the file with requirements list
+        Путь до файла со списком зависимостей
     """
     comment_identifiers = ('"', '#', '-', 'git+')
 
@@ -29,12 +29,12 @@ def read_requirements(path: str) -> tp.List[str]:
 
 def read_version(path: str) -> str:
     """
-    Reads file from 'path' and gets the project's version from it
+    Считывает из файла версию пакета и возвращает ее в виде 'major.minor.buiild'
 
-    Parameters
-    ----------
+    Параметры
+    ---------
     path : str, required
-        Path to the file with the projetc's version
+        Путь до файла с номером текущей версии
     """
     return open(path, 'r').read().strip()
 

@@ -1,8 +1,6 @@
 """
-Widget for the game's field show
+Виджет для отображения игровой доски
 """
-from copy import copy
-
 from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QSizePolicy
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
@@ -17,7 +15,7 @@ class ChessBoard(QWidget):
     onStep = pyqtSignal(Step, name='onStep')
 
     """
-    Widget for chess board show and manage
+    Отображение сетки кнопок 8 на 8
     """
     def __init__(self, config: tp.Dict, engine: ChessGame, mapper: FiguresMapper):
         super(ChessBoard, self).__init__()
@@ -36,19 +34,19 @@ class ChessBoard(QWidget):
 
 
     def update_field(self):
+        """Устанавливает на кнопки с фигурами картинки"""
         for row in self.buttons:
             for btn in row:
                 btn.setIcon(QIcon())
 
         for figure in self.engine.get_figures():
-            #pixmap = QPixmap())
             icon = QIcon(self.mapper.map_figure_to_svg(figure[0]))
             self.buttons[figure[1].y][figure[1].x].setIcon(icon)
 
 
     def __clear_to_base(self):
         """
-        Unset danger or warning styles
+        Убирает нестандартные стили с кнопок
         """
         for pos in self.non_base:
             self.buttons[pos.y][pos.x].setStyleSheet(self.__generate_base_style(pos))
@@ -57,7 +55,7 @@ class ChessBoard(QWidget):
 
     def __create_root_grid(self) -> QGridLayout:
         """
-        Creates grid with the generated buttons
+        Заполняет сетку ранее созданными кнопками
         """
         grid = QGridLayout()
 
@@ -73,7 +71,7 @@ class ChessBoard(QWidget):
 
     def __generate_buttons(self) -> tp.List[tp.List[QPushButton]]:
         """
-        Creates buttons grid (8*8)
+        Создает матрицу из кнопок (с необходимыми стилями)
         """
         from functools import partial
 
@@ -98,7 +96,7 @@ class ChessBoard(QWidget):
 
     def __generate_base_style(self, position: Position) -> str:
         """
-        Style for base button (unpressed, unselected, without step opportunity)
+        Генерирует стиль для базовых яччек (туда нет хода, там нет фигуры и тп).
         """
         return f"""
             QPushButton {{
@@ -124,7 +122,7 @@ class ChessBoard(QWidget):
 
     def __generate_danger_style(self) -> str:
         """
-        Style for cell wit figure in danger
+        Стиль для клеток, на которых находится фигура в опасности
         """
         return f"""
             QPushButton {{
@@ -144,7 +142,7 @@ class ChessBoard(QWidget):
 
     def __generate_step_style(self) -> str:
         """
-        Style for cell wit figure in danger
+        Стиль для клеток, куда можно выполнить ход
         """
         return f"""
             QPushButton {{
@@ -164,7 +162,7 @@ class ChessBoard(QWidget):
 
     def __chess_button_pressed(self, position: Position) -> None:
         """
-        Handles chess figures press
+        Событие при нажатии на одну из кнопок
         """
         if position in self.non_base:
             self.__process_step(position)
@@ -187,12 +185,9 @@ class ChessBoard(QWidget):
             )
             self.non_base.append(pos)
 
-        print(position, available_steps)
-
 
     def __process_step(self, position: Position) -> None:
-        print(f'from{self.non_base[0]} to {position}')
-
+        """Выполняет ход из позиции в позицию"""
         step = self.engine.make_step(self.non_base[0], position)
         if step is None: return
 

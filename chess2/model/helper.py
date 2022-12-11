@@ -1,5 +1,5 @@
 """
-Helper for games saving/loading
+Helper для работы с базой данных
 """
 from sqlalchemy.orm import Session
 from uuid import uuid4
@@ -11,14 +11,14 @@ from chess2.engine.mapper import FiguresMapper
 import typing as tp
 
 class DatabaseHelper:
-    """Helper for games saving/loading"""
+    """Сохраняет/загружает игровые партии"""
     def __init__(self, session: Session, mapper: FiguresMapper):
         self.session = session
         self.mapper = mapper
 
 
     def save_game(self, game: ChessGame, name: str) -> None:
-        """Saves game object to db"""
+        """Сохраняет текущую партия в базу данных с указанным именем"""
         obj = Game(
             uid=str(uuid4()),
             name=name,
@@ -37,11 +37,14 @@ class DatabaseHelper:
 
         self.session.commit()
 
+
     def get_saved_games(self) -> tp.List[str]:
+        """Возвращает список сохраненных партий"""
         return list(map(lambda x: x.name, self.session.query(Game).all()))
 
 
     def load_game(self, n: str, game: ChessGame) -> None:
+        """загружает партию из БД по ее имени"""
         obj: Game = self.session.query(Game).filter(Game.name == n).one()
         steps: tp.List[DbStep] = self.session.query(DbStep).filter(DbStep.game_id == obj.uid).all()
         steps.sort(key=lambda x: x.number)
@@ -53,6 +56,7 @@ class DatabaseHelper:
 
 
     def delete_game(self, n: str) -> None:
+        """Удаляет партию из БД"""
         obj: Game = self.session.query(Game).filter(Game.name == n).one()
 
         self.session.query(DbStep).filter(DbStep.game_id == obj.uid).delete()

@@ -1,5 +1,5 @@
 """
-Base application class for the Chess 2.0
+Основной класс приложения
 """
 from PyQt6.QtWidgets import QApplication
 from chess2.utils.bean import BeanManager
@@ -9,17 +9,18 @@ import typing as tp
 
 class ChessApplication(QApplication):
     """
-    Inits the Qt framework and open main window
+    Инициализирует QT и открывает главное окно
     """
 
     def __init__(self, argv: tp.List[str]) -> None:
         """
-        Inits the base QApplication instance
+        Инициализирует родительсий QApplication,
+        основное окно и менеджер элементов (бинов)
 
         Parameters
         ----------
         argv : tp.List[str], required
-            Input command line for the app (need for the Qt debug)
+            Список входных аргументов приложения (необходимы дя QT)
         """
         super().__init__(argv)
 
@@ -29,8 +30,8 @@ class ChessApplication(QApplication):
 
     def exec(self):
         """
-        Overrides default exec method, shows the main window
-        and starts events looping
+        Переписывает стандартный exec метод, отображает окно
+        игры и начинает обработку событий
         """
         self.main_window.show()
         super().exec()

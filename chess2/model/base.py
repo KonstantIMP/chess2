@@ -1,5 +1,5 @@
 """
-Base class for model descriptions
+Основной класс для описания моделей для БД
 """
 from sqlalchemy.ext.declarative import declarative_base
 

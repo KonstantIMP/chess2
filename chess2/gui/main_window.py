@@ -1,5 +1,5 @@
 """
-Main app's window
+Главное окно игры
 """
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QLabel, QListView, QSizePolicy
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QAbstractItemView
@@ -13,14 +13,11 @@ from chess2.engine.step import Step
 from chess2.engine.event import EventType
 from chess2.utils.bean import BeanManager
 
-import typing as tp
-
 
 class ChessMainWindow(QMainWindow):
     """
-    Contains all base elements, displays the play field
+    Содержит основные элементы интерфейса
     """
-
     def __init__(self, bmg: BeanManager) -> None:
         super().__init__()
 
@@ -37,7 +34,8 @@ class ChessMainWindow(QMainWindow):
 
     def __create_ui(self) -> None:
         """
-        Creates children, sets styles and titles
+        Создает дочерние виджеты
+        панель истории/доски/управления
         """
         self.setWindowTitle('Chess 2.0')
         self.resize(800, 450)
@@ -59,7 +57,7 @@ class ChessMainWindow(QMainWindow):
 
     def __create_history_panel(self) -> QWidget:
         """
-        Creates panel with scrollable list of steps
+        Панель с пролистываемым списком ходов
         """
         box = QVBoxLayout()
         box.addWidget(QLabel('History'))
@@ -77,7 +75,7 @@ class ChessMainWindow(QMainWindow):
 
     def __create_game_board(self) -> QWidget:
         """
-        Creates 8x8 grid with figures and empty cells
+        Инициализирует игровое поле
         """
         self.board = ChessBoard(self.cfg, self.engine, self.figures_mapper)
         self.board.onStep.connect(self.__on_step_done)
@@ -86,6 +84,7 @@ class ChessMainWindow(QMainWindow):
 
 
     def __on_step_done(self, step: Step) -> None:
+        """Действие при совершении хода"""
         from chess2.engine.figure_color import FigureColor as FC
 
         events = []
@@ -118,7 +117,7 @@ class ChessMainWindow(QMainWindow):
 
     def __create_control_panel(self) -> QWidget:
         """
-        Panel with buttons like 'save', 'load', 'new'
+        Создает панель с кноками создания новой игры/загрузки/сохранения и тп
         """
         from PyQt6.QtWidgets import QSpacerItem
 
@@ -154,6 +153,7 @@ class ChessMainWindow(QMainWindow):
 
 
     def __create_step_info_block(self) -> QWidget:
+        """Создает блок с информацией о текущем игроке и кнопкой сдаться"""
         box = QVBoxLayout()
 
         cc = QHBoxLayout()
@@ -178,6 +178,7 @@ class ChessMainWindow(QMainWindow):
 
 
     def __update_current_color(self) -> None:
+        """Устанавливает цвет текущего игрока"""
         from chess2.engine.figure_color import FigureColor
         self.color_state.setStyleSheet(f"""
             QPushButton {{ background-color: {
@@ -186,7 +187,9 @@ class ChessMainWindow(QMainWindow):
         """
         )
 
+
     def __create_new_game(self) -> None:
+        """Создание и запуск новой игры"""
         self.engine.create_new_game()
         self.board.update_field()
         self.__clear_history_panel()
@@ -195,10 +198,13 @@ class ChessMainWindow(QMainWindow):
 
 
     def __give_up(self):
+        """Один из игроков сдался"""
         self.board.setEnabled(False)
         self.__show_message_dialog(f'{str(self.engine.current_color).split(".")[-1]} has gave up')
 
+
     def __save_game(self) -> None:
+        """Процесс сохранения текущей партии"""
         if not self.board.isEnabled():
             self.__show_message_dialog('Nothing to save')
             return
@@ -218,6 +224,7 @@ class ChessMainWindow(QMainWindow):
 
 
     def __load_game(self) -> None:
+        """Загрузка игры из БД"""
         games = self.helper.get_saved_games()
         text, ok = QInputDialog.getItem(self, 'Game loading', 'Select game for load', games, 0, False)
 
@@ -235,12 +242,14 @@ class ChessMainWindow(QMainWindow):
             except Exception:
                 self.__show_message_dialog('Something went wrong')
 
+
     def __clear_history_panel(self) -> None:
+        """Очистка панели истории"""
         self.list_model.removeRows(0, self.list_model.rowCount())
 
 
     def __delete_saved_game(self) -> None:
-        """Deletes saved game from db"""
+        """Удаление одной из ранее сохраненных игр"""
         games = self.helper.get_saved_games()
         text, ok = QInputDialog.getItem(self, 'Game deletion', 'Select game for remove', games, 0, False)
 
@@ -251,7 +260,9 @@ class ChessMainWindow(QMainWindow):
             except Exception:
                 self.__show_message_dialog('Cant remove the game')
 
+
     def __show_message_dialog(self, msg: str) -> None:
+        """Показывает диалоговое окно с каким-то сообщением"""
         from PyQt6.QtWidgets import QMessageBox
 
         box = QMessageBox(self)

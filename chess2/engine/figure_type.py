@@ -1,11 +1,11 @@
 """
-Supported figure types
+Доступные типы фигур
 """
 from enum import Enum
 
 
 class FigureType(Enum):
-    """Supported figure types"""
+    """Все возможные виды фигур"""
     PAWN   = ('♙', '♟︎') # пешка
     ROCK   = ('♖', '♜') # Башня
     KNIGHT = ('♘', '♞') # Конь
