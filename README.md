@@ -15,11 +15,13 @@
 
 Проект создан с:
 
-- pyqt6
-- pyqt-tools
-- pyyaml
-- sqlalchemy
-- sqlalchemy.orm
+```
+pyqt6
+pyqt-tools
+pyyaml
+sqlalchemy
+sqlalchemy.orm
+```
 
 ## Установка
 
