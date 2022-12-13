@@ -98,7 +98,7 @@ class ChessGame:
         return self.field[position.y][position.x]
 
 
-    def get_available_steps(self, position: tp.Union[Position, tp.Tuple[int, int], str]) -> tp.List[Position]:
+    def get_available_steps(self, position: tp.Union[Position, tp.Tuple[int, int], str], check_castling: bool = True) -> tp.List[Position]:
         """
         Возвращает возможные позиции, куда может совершить ход
         фигура, по заданным координатам
@@ -116,14 +116,16 @@ class ChessGame:
                 res = flatten(lines + diagonals)
             case FigureType.ROCK:
                 res = flatten(lines)
-                castling = self.__check_rock_castling(position)
-                if castling != None: extra.append(castling)
+                if check_castling:
+                    castling = self.__check_rock_castling(position)
+                    if castling != None: extra.append(castling)
             case FigureType.BISHOP:
                 res = flatten(diagonals)
             case FigureType.KING:
                 res = flatten(list(map(lambda x: x[0:1], lines + diagonals)))
-                castling = self.__check_king_castling(position)
-                if castling != None: extra.append(castling)
+                if check_castling:
+                    castling = self.__check_king_castling(position)
+                    if castling != None: extra.append(castling)
             case FigureType.KNIGHT:
                 res = self.__get_available_knight_steps(position)
             case FigureType.PAWN:
@@ -341,13 +343,13 @@ class ChessGame:
         temp_figure = self.get_figure(position)
         if temp_figure != None:
             for enemy in self.get_figures(FigureColor.WHITE if temp_figure.color == FigureColor.BLACK else FigureColor.BLACK):
-                all_steps += self.get_available_steps(enemy[1])
+                all_steps += self.get_available_steps(enemy[1], False)
         elif danger_from != None:
             for enemy in self.get_figures(danger_from):
-                all_steps += self.get_available_steps(enemy[1])
+                all_steps += self.get_available_steps(enemy[1], False)
         else:
             for enemy in self.get_figures():
-                all_steps += self.get_available_steps(enemy[1])
+                all_steps += self.get_available_steps(enemy[1], False)
 
         return position in all_steps
 
