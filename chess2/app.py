@@ -11,7 +11,6 @@ class ChessApplication(QApplication):
     """
     Инициализирует QT и открывает главное окно
     """
-
     def __init__(self, argv: tp.List[str]) -> None:
         """
         Инициализирует родительсий QApplication,

@@ -24,6 +24,7 @@ class ChessGame:
         field: 8 на 8 поле с фигурами
         mapper: конвертер для фигур и их расположений 
         current_color: цвет игрока, чей ход сейчас
+        king_moves: перемещался ли король
     """
     def __init__(self, mapper: FiguresMapper = FiguresMapper()):
         self.field = self.__generate_empty_field()
@@ -31,6 +32,8 @@ class ChessGame:
 
         self.current_color = FigureColor.WHITE
         self.history: tp.List[Step] = []
+
+        self.king_moves = dict()
 
 
     def create_new_game(self) -> None:
@@ -53,6 +56,9 @@ class ChessGame:
 
         self.field[0][4] = Figure(FigureType.KING, FigureColor.BLACK)
         self.field[0][3] = Figure(FigureType.QUEEN, FigureColor.BLACK)
+
+        self.king_moves[FigureColor.BLACK] = False
+        self.king_moves[FigureColor.WHITE] = False
 
         self.history = []
 
@@ -99,7 +105,7 @@ class ChessGame:
         """
         if not isinstance(position, Position): position = self.mapper.map_to_position(position)
 
-        figure, res = self.get_figure(position), []
+        figure, res, extra = self.get_figure(position), [], []
         if figure is None: return []
 
         lines = self.__get_available_line_steps(position)
@@ -110,10 +116,14 @@ class ChessGame:
                 res = flatten(lines + diagonals)
             case FigureType.ROCK:
                 res = flatten(lines)
+                castling = self.__check_rock_castling(position)
+                if castling != None: extra.append(castling)
             case FigureType.BISHOP:
                 res = flatten(diagonals)
             case FigureType.KING:
                 res = flatten(list(map(lambda x: x[0:1], lines + diagonals)))
+                castling = self.__check_king_castling(position)
+                if castling != None: extra.append(castling)
             case FigureType.KNIGHT:
                 res = self.__get_available_knight_steps(position)
             case FigureType.PAWN:
@@ -123,7 +133,7 @@ class ChessGame:
             filter(
                 lambda x: self.get_figure(x) is None or self.get_figure(x).color != self.current_color, res
             )
-        )
+        ) + extra
 
 
     def make_step(self, a: Position, b: Position) -> tp.Optional[Step]:
@@ -131,30 +141,40 @@ class ChessGame:
         Выполняет ход фигуры из a в b
         Если ход невозможен, возвращает None
         """
-        if self.get_figure(a).color != self.current_color:
+        if self.get_figure(a) is None or self.get_figure(a).color != self.current_color or b not in self.get_available_steps(a):
             return None
 
-        if b not in self.get_available_steps(a):
-            return None
+        events, castling = [], self.get_figure(b) is not None and self.get_figure(a).color == self.get_figure(b).color
 
-        events = []
-
-        if self.get_figure(b) is not None:
+        if self.get_figure(b) is not None and self.get_figure(a).color != self.get_figure(b).color:
             events.append(Event(EventType.KILL, self.get_figure(b)))
         if self.get_figure(a).type == FigureType.PAWN and (b.y in [0, 7]):
             events.append(Event(EventType.UPGRADE, None))
             self.field[a.y][a.x] = Figure(FigureType.QUEEN, self.get_figure(a).color)
         if self.get_figure(b) is not None and self.get_figure(b).type == FigureType.KING:
-            events.append(Event(EventType.WIN, None))
+            if self.get_figure(a).color != self.get_figure(b).color:
+                events.append(Event(EventType.WIN, None))
 
-        self.field[b.y][b.x] = self.field[a.y][a.x]
-        self.field[a.y][a.x] = None
+        if castling == True:
+            self.king_moves[self.get_figure(a).color] = True
+            king, kp, rock, rp = self.get_figure(a), a, self.get_figure(b), b
+            if king.type != FigureType.KING: king, kp, rock, rp = rock, rp, king, kp
+            direction_mul = 1 if rp.x == 7 else -1
+
+            self.field[kp.y][kp.x + direction_mul], self.field[rp.y][rp.x], self.field[kp.y][kp.x] = rock, None, None
+            self.field[kp.y][kp.x + 2 * direction_mul] = king
+
+            b = Position(kp.x + 2 * direction_mul, kp.y)
+            events.append(Event(EventType.CASTLING, None))
+        else:
+            if self.get_figure(a).type == FigureType.KING:
+                self.king_moves[self.get_figure(a).color] = True
+            self.field[b.y][b.x] = self.field[a.y][a.x]
+            self.field[a.y][a.x] = None
 
         self.__swap_current_color()
-
-        step = Step(a, b, self.get_figure(b), events)
-        self.history.append(step)
-        return step
+        self.history.append(Step(a, b, self.get_figure(b), events))
+        return self.history[-1]
 
 
     def __get_available_line_steps(self, position: Position) -> tp.List[tp.List[Position]]:
@@ -179,6 +199,45 @@ class ChessGame:
                     break
 
         return lines
+
+
+    def __check_rock_castling(self, position: Position) -> tp.Optional[Position]:
+        """
+        Проверяет, возможно ли выполнить рокировку ладьей
+        Если да, то возвращает координаты короля
+        """
+        rock = self.get_figure(position)
+        if rock == None or rock.type != FigureType.ROCK or self.king_moves[rock.color] or position.x not in [0, 7]:
+            return None
+
+        king_pos = Position(x=4, y=0 if rock.color == FigureColor.BLACK else 7)
+        if king_pos.y != position.y:
+            return None
+        
+        for i in range(min(position.x, king_pos.x) + 1, max(position.x, king_pos.x)):
+            temp_pos = Position(x=i, y=position.y)
+            if self.get_figure(temp_pos) != None:
+                return None
+            if self.__is_position_in_dager(temp_pos, FigureColor.BLACK if rock.color == FigureColor.WHITE else FigureColor.WHITE):
+                return None
+
+        return king_pos
+
+
+    def __check_king_castling(self, position: Position) -> tp.Optional[Position]:
+        """
+        Проверяет, позможно ли выполнить рокировку королем
+        Если да, то возвращает координаты ладьи
+        """
+        king = self.get_figure(position)
+        if king == None or king.type != FigureType.KING or self.king_moves[king.color]:
+            return None
+
+        for rock in filter(lambda x: x[0].type == FigureType.ROCK, self.get_figures(king.color)):
+            temp = self.__check_rock_castling(rock[1])
+            if temp != None: return rock[1]
+
+        return None
 
     
     def __get_available_diagonal_steps(self, position: Position) -> tp.List[tp.List[Position]]:
@@ -207,7 +266,7 @@ class ChessGame:
 
     def __get_available_knight_steps(self, position: Position) -> tp.List[Position]:
         """
-        GДоступные перемещения для коня
+        Доступные перемещения для коня
         """
         res = []
 
@@ -271,6 +330,26 @@ class ChessGame:
             )
 
         return res
+
+
+    def __is_position_in_dager(self, position: Position, danger_from: tp.Optional[FigureColor] = None) -> bool:
+        """
+        Проверяет, находится ли заданная клетка в опсаности
+        """
+        all_steps = list()
+
+        temp_figure = self.get_figure(position)
+        if temp_figure != None:
+            for enemy in self.get_figures(FigureColor.WHITE if temp_figure.color == FigureColor.BLACK else FigureColor.BLACK):
+                all_steps += self.get_available_steps(enemy[1])
+        elif danger_from != None:
+            for enemy in self.get_figures(danger_from):
+                all_steps += self.get_available_steps(enemy[1])
+        else:
+            for enemy in self.get_figures():
+                all_steps += self.get_available_steps(enemy[1])
+
+        return position in all_steps
 
 
     def __swap_current_color(self) -> None:

@@ -158,6 +158,27 @@ class ChessBoard(QWidget):
                 border: 0px solid black;
             }}
         """
+        
+
+    
+    def __generate_castling_style(self) -> str:
+        """
+        Стиль для клеток, с возможной рокировкой
+        """
+        return f"""
+            QPushButton {{
+                background-color: {
+                    self.cfg['castling_color']
+                };
+                border: 0px solid black;
+            }}
+            QPushButton:hover {{
+                background-color: {
+                    self.cfg['castling_hover_color']
+                };
+                border: 0px solid black;
+            }}
+        """
 
 
     def __chess_button_pressed(self, position: Position) -> None:
@@ -181,7 +202,8 @@ class ChessBoard(QWidget):
         available_steps = self.engine.get_available_steps(position)
         for pos in available_steps:
             self.buttons[pos.y][pos.x].setStyleSheet(
-                self.__generate_step_style() if self.engine.get_figure(pos) is None else self.__generate_danger_style()
+                self.__generate_step_style() if self.engine.get_figure(pos) is None else 
+                (self.__generate_danger_style() if current_figure.color != self.engine.get_figure(pos).color else self.__generate_castling_style())
             )
             self.non_base.append(pos)
 
@@ -191,10 +213,7 @@ class ChessBoard(QWidget):
         step = self.engine.make_step(self.non_base[0], position)
         if step is None: return
 
-        self.buttons[position.y][position.x].setIcon(
-            QIcon(self.mapper.map_figure_to_svg(step.figure))
-        )
-        self.buttons[self.non_base[0].y][self.non_base[0].x].setIcon(QIcon())
+        self.update_field()
 
         self.__clear_to_base()
         self.onStep.emit(step)

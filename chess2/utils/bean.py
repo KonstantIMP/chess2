@@ -4,13 +4,15 @@
 from chess2.gui.mapper import GuiMapper
 from chess2.engine.mapper import FiguresMapper
 from chess2.engine.chess import ChessGame
-from pkg_resources import resource_filename
 from chess2.model.helper import DatabaseHelper
+from chess2.model.base import Base
+from pkg_resources import resource_filename
 from pathlib import Path
 from sqlalchemy.orm import Session
 import sqlalchemy
 import typing as tp
 import yaml
+
 
 class BeanManager:
     """
@@ -27,7 +29,6 @@ class BeanManager:
 
         self.sql_engine = sqlalchemy.create_engine('sqlite:///games.db', echo=True)
         with self.sql_engine.begin() as connection:
-            from chess2.model.base import Base
             Base.metadata.create_all(connection)
 
         self.session = Session(bind=self.sql_engine)

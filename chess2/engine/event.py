@@ -9,9 +9,10 @@ import typing as tp
 
 class EventType(Enum):
     """Доступные события"""
-    KILL    = 0, # Убийство фигуры
-    UPGRADE = 1, # Пешка проапгрейдилась
-    WIN     = 2  # Короля убили
+    KILL     = 0, # Убийство фигуры
+    UPGRADE  = 1, # Пешка проапгрейдилась
+    WIN      = 2, # Короля убили,
+    CASTLING = 3  # Рокировка
 
 
 @dataclass

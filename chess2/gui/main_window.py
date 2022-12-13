@@ -97,6 +97,7 @@ class ChessMainWindow(QMainWindow):
                     'WHITE' if self.engine.current_color == FC.BLACK else 'BLACK'
                 }""")
                 self.board.setEnabled(False)
+            else: events.append(f'R')
 
         res = f"""{
                 self.figures_mapper.map_figure_to_unicode(step.figure)

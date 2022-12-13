@@ -16,4 +16,3 @@ class Step(Base):
     game_id = Column(String, ForeignKey('games.uid'))
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    #game = relationship('Game', back_populates='steps')

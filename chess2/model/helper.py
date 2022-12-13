@@ -52,7 +52,10 @@ class DatabaseHelper:
         game.create_new_game()
 
         for step in steps:
-            game.make_step(self.mapper.map_to_position(step.a), self.mapper.map_to_position(step.b))
+            game.make_step(
+                self.mapper.map_to_position(step.a),
+                self.mapper.map_to_position(step.b)
+            )
 
 
     def delete_game(self, n: str) -> None:
@@ -63,3 +66,4 @@ class DatabaseHelper:
         self.session.query(Game).filter(Game.uid == obj.uid).delete()
 
         self.session.commit()
+
