@@ -88,6 +88,11 @@ class ChessGame:
         """
         Возвращает фигуру, расположенную на указанной позиции
         Если на позиции нет фигуры, возвращает None
+
+        Параметры
+        ---------
+        position: position: tp.Union[Position, tp.Tuple[int, int], str], required
+            Координаты фигуры для получения
         """
         if not isinstance(position, Position):
             return self.get_figure(self.mapper.map_to_position(position))
@@ -102,6 +107,13 @@ class ChessGame:
         """
         Возвращает возможные позиции, куда может совершить ход
         фигура, по заданным координатам
+
+        Параметры
+        ---------
+        position: tp.Union[Position, tp.Tuple[int, int], str], requirments
+            Позиция фигуры, ходы для которой нужно получить
+        checl_castling: bool, optional
+            Проверять ли возможность сделать рокировку
         """
         if not isinstance(position, Position): position = self.mapper.map_to_position(position)
 

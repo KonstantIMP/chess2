@@ -1,5 +1,5 @@
 pyqt6
-pyqt-tools
+#pyqt-tools
 pyyaml
 sqlalchemy
 sqlalchemy.orm

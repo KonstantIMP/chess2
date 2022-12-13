@@ -19,6 +19,21 @@ class MappingTest(unittest.TestCase):
             msg='Incorrect mapping'
         )
 
+        self.assertNotEqual(
+            FiguresMapper().map_figure_to_unicode(
+                Figure(FigureType.BISHOP, FigureColor.WHITE)
+            ),
+            ' '
+        )
+
+
+    def test_svg_mapping(self):
+        self.assertTrue(
+            FiguresMapper().map_figure_to_svg(
+                Figure(FigureType.BISHOP, FigureColor.WHITE)
+            ).count('w_bishop') == 1
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

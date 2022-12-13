@@ -7,6 +7,7 @@ from chess2.engine.chess import ChessGame
 
 from chess2.engine.figure_color import FigureColor
 from chess2.engine.figure_type import FigureType
+from chess2.engine.position import Position
 from chess2.engine.figure import Figure
 
 class LogicTest(unittest.TestCase):
@@ -14,7 +15,7 @@ class LogicTest(unittest.TestCase):
         game = ChessGame()
         game.create_new_game()
 
-        default_field  = '♜ ♞ ♝ ♞ ♛ ♝ ♞ ♜\n'
+        default_field  = '♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜\n'
         default_field += '♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎\n'
         default_field += (' ' * 15 + '\n') *  4
         default_field += '♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙\n'
@@ -32,4 +33,12 @@ class LogicTest(unittest.TestCase):
 
         with self.assertRaises(Exception):
             game.get_figure((-1, -1))
+
+    
+    def test_moves(self):
+        game = ChessGame()
+        game.create_new_game()
+
+        self.assertNotEqual(game.make_step(Position(0, 6), Position(0, 4)), None)
+        self.assertEqual(game.make_step(Position(5, 5), Position(6, 6)), None)
 
