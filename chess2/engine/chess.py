@@ -118,14 +118,14 @@ class ChessGame:
                 res = flatten(lines)
                 if check_castling:
                     castling = self.__check_rock_castling(position)
-                    if castling != None: extra.append(castling)
+                    if castling is not None: extra.append(castling)
             case FigureType.BISHOP:
                 res = flatten(diagonals)
             case FigureType.KING:
                 res = flatten(list(map(lambda x: x[0:1], lines + diagonals)))
                 if check_castling:
                     castling = self.__check_king_castling(position)
-                    if castling != None: extra.append(castling)
+                    if castling is not None: extra.append(castling)
             case FigureType.KNIGHT:
                 res = self.__get_available_knight_steps(position)
             case FigureType.PAWN:
@@ -209,7 +209,7 @@ class ChessGame:
         Если да, то возвращает координаты короля
         """
         rock = self.get_figure(position)
-        if rock == None or rock.type != FigureType.ROCK or self.king_moves[rock.color] or position.x not in [0, 7]:
+        if rock is None or rock.type != FigureType.ROCK or self.king_moves[rock.color] or position.x not in [0, 7]:
             return None
 
         king_pos = Position(x=4, y=0 if rock.color == FigureColor.BLACK else 7)
@@ -218,7 +218,7 @@ class ChessGame:
         
         for i in range(min(position.x, king_pos.x) + 1, max(position.x, king_pos.x)):
             temp_pos = Position(x=i, y=position.y)
-            if self.get_figure(temp_pos) != None:
+            if self.get_figure(temp_pos) is not None:
                 return None
             if self.__is_position_in_dager(temp_pos, FigureColor.BLACK if rock.color == FigureColor.WHITE else FigureColor.WHITE):
                 return None
@@ -232,12 +232,12 @@ class ChessGame:
         Если да, то возвращает координаты ладьи
         """
         king = self.get_figure(position)
-        if king == None or king.type != FigureType.KING or self.king_moves[king.color]:
+        if king is None or king.type != FigureType.KING or self.king_moves[king.color]:
             return None
 
         for rock in filter(lambda x: x[0].type == FigureType.ROCK, self.get_figures(king.color)):
             temp = self.__check_rock_castling(rock[1])
-            if temp != None: return rock[1]
+            if temp is not None: return rock[1]
 
         return None
 
@@ -341,10 +341,10 @@ class ChessGame:
         all_steps = list()
 
         temp_figure = self.get_figure(position)
-        if temp_figure != None:
+        if temp_figure is not None:
             for enemy in self.get_figures(FigureColor.WHITE if temp_figure.color == FigureColor.BLACK else FigureColor.BLACK):
                 all_steps += self.get_available_steps(enemy[1], False)
-        elif danger_from != None:
+        elif danger_from is not None:
             for enemy in self.get_figures(danger_from):
                 all_steps += self.get_available_steps(enemy[1], False)
         else:
